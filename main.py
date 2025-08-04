@@ -2,6 +2,8 @@ from fastapi import FastAPI, File, UploadFile
 from firebase_config import init_firebase
 from recognition import load_known_faces, recognize_person
 import shutil
+import os
+os.environ["TRANSFORMERS_CACHE"] = "/tmp/huggingface"
 
 app = FastAPI()
 db = init_firebase()
