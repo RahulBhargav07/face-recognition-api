@@ -1,9 +1,9 @@
 fastapi
 uvicorn
 firebase-admin
-imgbeddings
+imgbeddings-lite
 opencv-python-headless
 pillow
 scikit-learn
 python-multipart
-huggingface_hub==0.11.1  # Compatible version for imgbeddings
+huggingface_hub==0.11.1
