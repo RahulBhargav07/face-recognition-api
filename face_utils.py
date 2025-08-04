@@ -1,30 +1,32 @@
+import mediapipe as mp
+import cv2
 import numpy as np
 from imgbeddings import imgbeddings
 from PIL import Image
 from sklearn.metrics.pairwise import cosine_similarity
-import os
 
 ibed = imgbeddings()
-face_db = {}  # In-memory cache {name: (embedding, details)}
+mp_face_detection = mp.solutions.face_detection
 
-def enroll_face(image: Image.Image, name: str, details: str):
-    emb = ibed.to_embeddings(image)[0]
-    face_db[name] = (emb, details)
-    return {"name": name, "details": details, "status": "enrolled"}
+def detect_face(image_np):
+    with mp_face_detection.FaceDetection(model_selection=1, min_detection_confidence=0.5) as detector:
+        results = detector.process(cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR))
+        if results.detections:
+            det = results.detections[0]
+            bbox = det.location_data.relative_bounding_box
+            h, w, _ = image_np.shape
+            x, y = int(bbox.xmin * w), int(bbox.ymin * h)
+            w, h = int(bbox.width * w), int(bbox.height * h)
+            return image_np[y:y+h, x:x+w]
+    return None
 
-def recognize_face(image: Image.Image, threshold: float = 0.7):
-    if not face_db:
-        return {"status": "no known faces"}
+def get_embedding(pil_img):
+    return ibed.to_embeddings(pil_img)[0]
 
-    emb = ibed.to_embeddings(image)[0].reshape(1, -1)
-    best_match = {"name": "Unknown", "confidence": 0.0}
-
-    for name, (known_emb, details) in face_db.items():
-        sim = cosine_similarity(emb, known_emb.reshape(1, -1))[0][0]
-        if sim > best_match["confidence"]:
-            best_match = {"name": name, "confidence": float(sim), "details": details}
-
-    if best_match["confidence"] < threshold:
-        best_match["name"] = "Unknown"
-
-    return best_match
+def match_face(embedding, known_embeddings, known_names, threshold=0.7):
+    embedding = embedding.reshape(1, -1)
+    similarities = cosine_similarity(embedding, known_embeddings)
+    best_idx = np.argmax(similarities)
+    if similarities[0][best_idx] > threshold:
+        return known_names[best_idx], similarities[0][best_idx]
+    return "Unknown", 0.0
