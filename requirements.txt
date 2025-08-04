@@ -1,7 +1,7 @@
 fastapi
 uvicorn
 firebase-admin
-imgbeddings==0.1.7
+imgbeddings==0.1.0
 opencv-python-headless
 pillow
 scikit-learn
