@@ -2,7 +2,7 @@ fastapi==0.111.0
 uvicorn==0.30.1
 opencv-python-headless==4.10.0.82
 firebase-admin==6.5.0
-imgbeddings==0.2.0
+imgbeddings==0.1.0
 pillow==10.3.0
 mediapipe==0.10.15
 numpy==1.26.4
