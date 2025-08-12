@@ -1,7 +1,7 @@
 fastapi
 uvicorn
+imgbeddings
 firebase-admin
-python-multipart
-deepface
-opencv-python-headless
 Pillow
+scikit-learn
+numpy
